@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Timestamp Converter</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Timestamp Converter</h2>
+
+<h3>Unix Timestamp → Date</h3>
+
+<input type="text" id="timestampInput" placeholder="Enter Unix timestamp">
+
+<button onclick="timestampToDate()">Convert</button><br><br>
+<button onclick="currentTimestamp()">Current Timestamp</button><br><br>
+
+<div class="result-box">
+<p id="localTime"></p>
+<p id="utcTime"></p>
+<p id="isoTime"></p>
+</div>
+
+<hr>
+
+<h3>Date → Unix Timestamp</h3>
+
+<input type="datetime-local" id="dateInput">
+
+<button onclick="dateToTimestamp()">Convert</button><br><br>
+
+<p id="timestampResult"></p>
+
+<button onclick="copyTimestamp()">Copy</button>
+
+</div>
+
+<script src="/js/timestamp-converter.js"></script>
+
+</body>
+
+</html>

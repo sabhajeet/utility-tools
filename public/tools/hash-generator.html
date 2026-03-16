@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Hash Generator</title>
+<link rel="stylesheet" href="/css/style.css">
+
+<!-- CryptoJS Library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Hash Generator</h2>
+
+<textarea id="inputText" placeholder="Enter text here"></textarea>
+
+<select id="hashType">
+
+<option value="md5">MD5</option>
+<option value="sha1">SHA1</option>
+<option value="sha256">SHA256</option>
+<option value="sha512">SHA512</option>
+
+</select>
+
+<button onclick="generateHash()">Generate Hash</button>
+<br><br>
+<textarea id="outputText" placeholder="Hash result will appear here" readonly></textarea>
+
+</div>
+
+<script src="/js/hash.js"></script>
+
+</body>
+
+</html>

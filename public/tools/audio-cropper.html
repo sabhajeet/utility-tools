@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Professional Audio Cropper</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        #waveform { width: 100%; height: 250px; border: 1px solid #ccc; margin: 15px 0; }
+        .controls { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+        .controls button { padding: 8px 15px; font-size: 14px; cursor: pointer; }
+        #timeDisplay { margin-bottom: 15px; font-weight: bold; }
+        #zoomSlider { width: 200px; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Professional Audio Cropper</h2>
+    <input type="file" id="audioFile" accept="audio/*"><br><br>
+    <input type="range" id="zoomSlider" min="0" max="200" value="100"> Zoom
+    <div id="waveform"></div>
+    <div id="timeDisplay">Start: 0s | End: 0s | Duration: 0s</div>
+    <div class="controls">
+        <button id="playBtn">Play/Pause</button>
+        <button id="stopBtn">Stop</button>
+        <button id="cropBtn">Crop & Download</button>
+    </div>
+</div>
+
+<script src="/js/wavesurfer.min.js"></script>
+<script src="/js/regions.min.js"></script>
+<script src="/js/audio-cropper.js"></script>
+</body>
+</html>

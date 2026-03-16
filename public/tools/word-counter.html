@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Word Counter</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Word Counter</h2>
+
+<!-- <textarea id="textInput" placeholder="Enter or paste your text here"></textarea> -->
+
+<!-- auto update while typing -->
+ <textarea id="textInput" oninput="countWords()" placeholder="Enter or paste your text here"></textarea>
+
+<button onclick="countWords()">Count</button>
+
+<div id="result">
+
+<p>Words: <span id="words">0</span></p>
+<p>Characters: <span id="characters">0</span></p>
+<p>Characters (no spaces): <span id="noSpaces">0</span></p>
+<p>Sentences: <span id="sentences">0</span></p>
+<p>Paragraphs: <span id="paragraphs">0</span></p>
+<p>Lines: <span id="lines">0</span></p>
+
+</div>
+
+</div>
+
+<script src="/js/word-counter.js"></script>
+
+</body>
+
+</html>

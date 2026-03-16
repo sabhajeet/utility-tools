@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>User-Agent Parser</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>User-Agent Parser</h2>
+
+<textarea id="uaInput" placeholder="Paste User-Agent string here...   i.e.- Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/122.0.0.0 Safari/537.36"></textarea>
+
+<button onclick="parseUA()">Parse User-Agent</button><br><br>
+<button onclick="getMyUA()">Use My User-Agent</button>
+
+<div class="result-box">
+
+<p><b>Browser:</b> <span id="browser"></span></p>
+<p><b>Version:</b> <span id="version"></span></p>
+<p><b>Operating System:</b> <span id="os"></span></p>
+<p><b>Device:</b> <span id="device"></span></p>
+
+</div>
+
+</div>
+
+<script src="/js/user-agent-parser.js"></script>
+
+</body>
+
+</html>

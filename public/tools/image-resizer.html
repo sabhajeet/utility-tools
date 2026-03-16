@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Image Resizer</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Image Resizer</h2>
+
+<input type="file" id="imageInput" accept="image/*">
+
+<div class="input-group">
+<label>Width (px)</label>
+<input type="number" id="width" placeholder="Enter width">
+</div>
+
+<div class="input-group">
+<label>Height (px)</label>
+<input type="number" id="height" placeholder="Enter height">
+</div>
+
+<label>
+<input type="checkbox" id="lockRatio" checked>
+Maintain Aspect Ratio
+</label>
+
+<button onclick="resizeImage()">Resize Image</button> <br><br>
+<button onclick="resetResizer()">Reset</button>
+
+<div class="result-box">
+
+<p><b>Original Size:</b> <span id="originalSize"></span></p>
+<p><b>New Size:</b> <span id="newSize"></span></p>
+
+</div>
+
+<img id="preview" style="max-width:100%;margin-top:15px;">
+
+<a id="downloadLink" style="display:none;" download="resized-image.jpg">
+<button>Download Image</button>
+</a>
+
+</div>
+
+<script src="/js/image-resizer.js"></script>
+
+</body>
+
+</html>

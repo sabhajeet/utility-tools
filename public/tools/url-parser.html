@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>URL Parser</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>URL Parser</h2>
+
+<input type="text" id="urlInput" placeholder="Enter URL here">
+
+<button onclick="parseURL()">Parse URL</button>
+
+<h3>Result</h3>
+
+<textarea id="result" readonly></textarea>
+
+</div>
+
+<script src="/js/url-parser.js"></script>
+
+</body>
+
+</html>
+
+
+<!-- Example URL:
+
+https://example.com:8080/products/item?id=100&color=red#details
+
+Parsed output:
+
+Protocol : https
+Host     : example.com
+Port     : 8080
+Path     : /products/item
+Query    : id=100&color=red
+Hash     : #details -->

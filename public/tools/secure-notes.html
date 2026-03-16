@@ -1,0 +1,38 @@
+<div id="auth-container">
+    <h3 id="auth-title">Sign Up</h3>
+    <input type="text" id="name" placeholder="Name">
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Password">
+    <button id="auth-btn">Sign Up</button>
+    <p id="message"></p>
+</div>
+
+<script>
+document.getElementById("auth-btn").addEventListener("click", async ()=>{
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    const messageEl = document.getElementById("message");
+
+    try{
+        const res = await fetch("http://localhost:3001/api/auth/signup", {
+            method:"POST",
+            headers:{ "Content-Type":"application/json" },
+            body: JSON.stringify({ name, email, password })
+        });
+
+        const data = await res.json();
+
+        if(res.ok){
+            localStorage.setItem("token", data.token);
+            messageEl.innerText = "Sign Up successful!";
+        }else{
+            messageEl.innerText = data.message || "Sign Up failed";
+        }
+    }catch(err){
+        console.error(err);
+        messageEl.innerText = "Server error";
+    }
+});
+</script>

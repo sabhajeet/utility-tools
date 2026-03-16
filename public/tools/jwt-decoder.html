@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>JWT Decoder</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>JWT Decoder</h2>
+
+<textarea id="jwtInput" placeholder="Paste JWT token here"></textarea>
+
+<button onclick="decodeJWT()">Decode Token</button>
+
+<h3>Header</h3>
+<textarea id="headerOutput" readonly></textarea>
+
+<h3>Payload</h3>
+<textarea id="payloadOutput" readonly></textarea>
+
+</div>
+
+<script src="/js/jwt.js"></script>
+
+</body>
+
+</html>

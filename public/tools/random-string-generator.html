@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Random String Generator</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Random String Generator</h2>
+
+<label>Length</label><br><br>
+<input type="number" id="length" value="16" min="1" max="128">
+
+<div class="options">
+
+<label><input type="checkbox" id="uppercase" checked> Uppercase (A-Z)</label>
+<label><input type="checkbox" id="lowercase" checked> Lowercase (a-z)</label>
+<label><input type="checkbox" id="numbers" checked> Numbers (0-9)</label>
+<label><input type="checkbox" id="symbols"> Symbols (!@#$)</label>
+
+</div>
+
+<button onclick="generateString()">Generate</button><br><br>
+
+<textarea id="result" readonly placeholder="Generated string will appear here"></textarea>
+
+<button onclick="copyResult()">Copy</button>
+
+</div>
+
+<script src="/js/random-string-generator.js"></script>
+
+</body>
+
+</html>

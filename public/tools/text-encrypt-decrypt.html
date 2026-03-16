@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Text Encrypt / Decrypt</title>
+<link rel="stylesheet" href="/css/style.css">
+
+<!-- CryptoJS Library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Text Encrypt / Decrypt</h2>
+
+<textarea id="inputText" placeholder="Enter text"></textarea>
+
+<input type="text" id="secretKey" placeholder="Enter secret key">
+
+<div class="btn-group">
+<button onclick="encryptText()">Encrypt</button><br><br>
+<button onclick="decryptText()">Decrypt</button><br><br>
+</div>
+
+<textarea id="outputText" placeholder="Result will appear here" readonly></textarea>
+
+</div>
+
+<script src="/js/text-encrypt-decrypt.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Image to Base64 Converter</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Image to Base64 Converter</h2>
+
+<input type="file" id="imageInput" accept="image/*">
+
+<button onclick="convertImage()">Convert to Base64</button>
+
+<div class="result-box">
+
+<p><b>Image Preview</b></p>
+<img id="preview" style="max-width:100%;margin-top:10px;">
+
+<p><b>Base64 Output</b></p>
+
+<textarea id="base64Output" rows="8" placeholder="Base64 string will appear here..."></textarea>
+
+</div>
+
+<button onclick="copyBase64()">Copy Base64</button>
+
+</div>
+
+<script src="/js/image-to-base64.js"></script>
+
+</body>
+
+</html>
