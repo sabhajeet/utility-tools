@@ -1,0 +1,222 @@
+<!-- This is the single page code no other page -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>World Time Converter</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+    font-family: 'Roboto', sans-serif;
+    background: linear-gradient(to right, #1f4037, #99f2c8);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px;
+    color: #333;
+}
+.container {
+    background-color: #ffffffcc;
+    border-radius: 15px;
+    padding: 30px 40px;
+    max-width: 800px;
+    width: 100%;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    text-align: center;
+}
+h1 { margin-bottom: 20px; font-size: 28px; color: #1f4037; }
+input, select, button {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+}
+button {
+    background-color: #1f4037;
+    color: #fff;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+button:hover { background-color: #30513b; transform: translateY(-2px); }
+
+.select-buttons {
+    display: flex;
+    justify-content: flex-start;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+    border: .5px solid rgb(74, 58, 219);
+    color: blue;
+}
+.select-buttons button {
+    width: auto;
+    flex: none;
+}
+
+
+.cards-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px;
+    max-height: 250px;
+    overflow-y: auto;
+    padding: 5px;
+}
+
+.card {
+    background-color: #f2f2f2;
+    padding: 10px 8px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.2s;
+    border: 2px solid transparent;
+    text-align: center;
+    font-size: 14px;
+}
+.card.selected {
+    background-color: #1f4037;
+    color: white;
+    border: 2px solid #30513b;
+}
+
+table { margin-top: 20px; width: 100%; border-collapse: collapse; border-radius: 10px; overflow: hidden; }
+th, td { padding: 12px; border-bottom: 1px solid #ccc; }
+th { background-color: #1f4037; color: #fff; text-align: left; }
+tr:nth-child(even) { background-color: #f2f2f2; }
+
+@media (max-width: 600px) {
+    h1 { font-size: 22px; }
+    input, button { font-size: 14px; }
+    .cards-container { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🌎 World Time Converter</h1>
+
+    <!-- Base time and country -->
+    <input type="time" id="timeInput" required>
+    <select id="baseCountrySelect"></select>
+
+    <!-- Select/Unselect All Buttons -->
+    <div class="select-buttons">
+        <button type="button" onclick="selectAll()">Select All</button>
+        <button type="button" onclick="unselectAll()">Unselect All</button>
+    </div>
+
+    <!-- Country cards -->
+    <div class="cards-container" id="cardsContainer"></div>
+
+    <button onclick="convertTime()">Convert Time</button>
+
+    <table id="resultTable" style="display:none;">
+        <thead>
+            <tr>
+                <th>Country</th>
+                <th>Local Time</th>
+            </tr>
+        </thead>
+        <tbody id="resultBody"></tbody>
+    </table>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/luxon@3/build/global/luxon.min.js"></script>
+<script>
+const { DateTime } = luxon;
+
+// Country list
+const countries = {
+    "Australia (Sydney)": "Australia/Sydney",
+    "Brazil": "America/Sao_Paulo",
+    "Canada (Toronto)": "America/Toronto",
+    "China": "Asia/Shanghai",
+    "France": "Europe/Paris",
+    "Germany": "Europe/Berlin",
+    "India": "Asia/Kolkata",
+    "Japan": "Asia/Tokyo",
+    "Malaysia": "Asia/Kuala_Lumpur",
+    "Philippines": "Asia/Manila",
+    "Russia (Moscow)": "Europe/Moscow",
+    "Singapore": "Asia/Singapore",
+    "South Africa": "Africa/Johannesburg",
+    "South Korea": "Asia/Seoul",
+    "UAE (Dubai)": "Asia/Dubai",
+    "UK": "Europe/London",
+    "USA (New York)": "America/New_York",
+    "USA (Los Angeles)": "America/Los_Angeles",
+    "New Zealand": "Pacific/Auckland"
+};
+
+// Sort alphabetically
+const sortedCountries = Object.entries(countries).sort((a,b)=>a[0].localeCompare(b[0]));
+
+const baseSelect = document.getElementById("baseCountrySelect");
+const cardsContainer = document.getElementById("cardsContainer");
+
+// Populate base select
+sortedCountries.forEach(([name, zone])=>{
+    const option = document.createElement("option");
+    option.value = zone;
+    option.text = name;
+    baseSelect.appendChild(option);
+});
+
+// Populate cards
+sortedCountries.forEach(([name, zone])=>{
+    const card = document.createElement("div");
+    card.className = "card selected";
+    card.textContent = name;
+    card.dataset.zone = zone;
+    card.addEventListener("click", ()=>{ card.classList.toggle("selected"); });
+    cardsContainer.appendChild(card);
+});
+
+// Select All / Unselect All
+function selectAll(){
+    cardsContainer.querySelectorAll(".card").forEach(card => card.classList.add("selected"));
+}
+function unselectAll(){
+    cardsContainer.querySelectorAll(".card").forEach(card => card.classList.remove("selected"));
+}
+
+// Convert Time
+function convertTime(){
+    const timeInput = document.getElementById("timeInput").value;
+    const baseZone = baseSelect.value;
+
+    if(!timeInput){ alert("Please enter a time!"); return; }
+
+    const [hour, minute] = timeInput.split(":").map(Number);
+    const dt = DateTime.now().setZone(baseZone).set({hour, minute, second:0, millisecond:0});
+
+    const selectedTargets = Array.from(cardsContainer.querySelectorAll(".card.selected"))
+                                .map(card => ({zone: card.dataset.zone, name: card.textContent}));
+
+    if(selectedTargets.length===0){ alert("Select at least one country!"); return; }
+
+    const tbody = document.getElementById("resultBody");
+    tbody.innerHTML = "";
+
+    selectedTargets.forEach(target=>{
+        const converted = dt.setZone(target.zone);
+        const row = document.createElement("tr");
+        row.innerHTML = `<td>${target.name}</td><td>${converted.toFormat("HH:mm")}</td>`;
+        tbody.appendChild(row);
+    });
+
+    document.getElementById("resultTable").style.display="table";
+}
+</script>
+
+</body>
+</html>
+

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PDF to Word</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<div class="container">
+    <h2>PDF to Word Converter</h2>
+
+    <input type="file" id="pdfFile" accept="application/pdf"><br><br>
+
+    <button onclick="convertPDF()">Convert & Download</button>
+
+    <p id="status"></p>
+</div>
+
+<script>
+async function convertPDF() {
+    const fileInput = document.getElementById('pdfFile');
+    const status = document.getElementById('status');
+
+    if (!fileInput.files.length) {
+        alert("Please select a PDF file");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('pdf', fileInput.files[0]);
+
+    status.innerText = "Converting...";
+
+    const response = await fetch('/api/pdf-word', {
+        method: 'POST',
+        body: formData
+    });
+
+    if (!response.ok) {
+        status.innerText = "Error converting file";
+        return;
+    }
+
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = "converted.docx";
+    a.click();
+
+    status.innerText = "Download started!";
+}
+</script>
+
+</body>
+</html>

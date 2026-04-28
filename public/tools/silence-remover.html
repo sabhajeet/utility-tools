@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Audio Silence Remover</title>
+
+<script src="https://unpkg.com/wavesurfer.js@7"></script>
+
+<style>
+
+body{
+font-family:Arial;
+background:#f4f6f8;
+text-align:center;
+margin-top:40px;
+}
+
+.container{
+width:750px;
+margin:auto;
+background:white;
+padding:25px;
+border-radius:10px;
+box-shadow:0 0 10px rgba(0,0,0,0.1);
+}
+
+.wavebox{
+margin-top:25px;
+}
+
+#waveformInput,
+#waveformOutput{
+height:120px;
+margin-top:10px;
+}
+
+button,input{
+padding:8px;
+margin:8px;
+font-size:14px;
+}
+
+button{
+background:#007bff;
+color:white;
+border:none;
+border-radius:5px;
+cursor:pointer;
+}
+
+button:hover{
+background:#0056b3;
+}
+
+audio{
+width:100%;
+margin-top:15px;
+}
+
+.timebox{
+font-size:13px;
+color:#444;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Audio Silence Remover & Enhancer</h2>
+
+<input type="file" id="audioFile" accept=".mp3,.wav,.m4a">
+
+<div class="wavebox">
+<h3>Input Audio Waveform</h3>
+<div id="waveformInput"></div>
+<div class="timebox">
+<span id="currentTimeIn">0</span> /
+<span id="totalTimeIn">0</span>
+</div>
+</div>
+
+<button id="playBtn">Play / Pause</button>
+
+<br>
+
+<label>Silence Duration (seconds)</label><br>
+<input type="number" id="duration" value="0.3" step="0.1">
+
+<br>
+
+<label>Noise Reduction Strength</label><br>
+
+<input type="range" id="noise" min="0" max="40" value="20">
+<span id="noiseValue">20</span>
+
+<br>
+
+<label>
+<input type="checkbox" id="enhance">
+Enhance Voice
+</label>
+
+<br>
+
+<label>
+<input type="checkbox" id="smartCut" checked>
+Auto Cut Long Pauses
+</label>
+
+<br><br>
+
+<button id="processBtn">Process Audio</button>
+
+<p id="status"></p>
+
+<div class="wavebox">
+<h3>Processed Audio Waveform</h3>
+<div id="waveformOutput"></div>
+<div class="timebox">
+<span id="currentTimeOut">0</span> /
+<span id="totalTimeOut">0</span>
+</div>
+</div>
+
+<div id="result"></div>
+
+</div>
+
+<script>
+
+let wavesurferInput
+let wavesurferOutput
+
+function formatTime(sec){
+
+sec=Math.floor(sec)
+
+let m=Math.floor(sec/60)
+let s=sec%60
+
+if(s<10) s="0"+s
+
+return m+":"+s
+}
+
+document.getElementById("noise").oninput=function(){
+document.getElementById("noiseValue").innerText=this.value
+}
+
+document.getElementById("audioFile").addEventListener("change",function(){
+
+const file=this.files[0]
+
+if(!file) return
+
+if(wavesurferInput){
+wavesurferInput.destroy()
+}
+
+wavesurferInput=WaveSurfer.create({
+container:"#waveformInput",
+waveColor:"#999",
+progressColor:"#007bff",
+height:100
+})
+
+wavesurferInput.load(URL.createObjectURL(file))
+
+wavesurferInput.on("ready",()=>{
+document.getElementById("totalTimeIn").innerText=
+formatTime(wavesurferInput.getDuration())
+})
+
+wavesurferInput.on("audioprocess",()=>{
+document.getElementById("currentTimeIn").innerText=
+formatTime(wavesurferInput.getCurrentTime())
+})
+
+})
+
+document.getElementById("playBtn").onclick=function(){
+
+if(wavesurferInput){
+wavesurferInput.playPause()
+}
+
+}
+
+document.getElementById("processBtn").onclick=function(){
+
+const file=document.getElementById("audioFile").files[0]
+
+if(!file){
+alert("Please select audio")
+return
+}
+
+const duration=document.getElementById("duration").value
+const enhance=document.getElementById("enhance").checked
+const smartCut=document.getElementById("smartCut").checked
+const noise=document.getElementById("noise").value
+
+const formData=new FormData()
+
+formData.append("audio",file)
+formData.append("duration",duration)
+formData.append("enhance",enhance)
+formData.append("smartCut",smartCut)
+formData.append("noise",noise)
+
+document.getElementById("status").innerText="Processing..."
+
+fetch("/api/silence-remover/process",{
+method:"POST",
+body:formData
+})
+.then(res=>res.json())
+.then(data=>{
+
+if(data.success){
+
+document.getElementById("status").innerText="Finished"
+
+document.getElementById("result").innerHTML=`
+
+<audio controls>
+<source src="${data.file}">
+</audio>
+
+<br><br>
+
+<a href="${data.file}" download>
+<button>Download Processed Audio</button>
+</a>
+
+`
+
+loadOutputWaveform(data.file)
+
+}else{
+
+document.getElementById("status").innerText="Processing failed"
+
+}
+
+})
+.catch(err=>{
+console.log(err)
+document.getElementById("status").innerText="Server error"
+})
+
+}
+
+function loadOutputWaveform(file){
+
+if(wavesurferOutput){
+wavesurferOutput.destroy()
+}
+
+wavesurferOutput=WaveSurfer.create({
+container:"#waveformOutput",
+waveColor:"#bbb",
+progressColor:"#28a745",
+height:100
+})
+
+wavesurferOutput.load(file)
+
+wavesurferOutput.on("ready",()=>{
+document.getElementById("totalTimeOut").innerText=
+formatTime(wavesurferOutput.getDuration())
+})
+
+wavesurferOutput.on("audioprocess",()=>{
+document.getElementById("currentTimeOut").innerText=
+formatTime(wavesurferOutput.getCurrentTime())
+})
+
+}
+
+</script>
+
+</body>
+</html>

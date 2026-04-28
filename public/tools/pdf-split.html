@@ -1,0 +1,158 @@
+<div class="container" style="
+    max-width:500px;
+    margin:40px auto;
+    background:#fff;
+    padding:25px;
+    border-radius:10px;
+    box-shadow:0 5px 15px rgba(0,0,0,0.1);
+    text-align:center;
+    font-family:Arial, Helvetica, sans-serif;
+">
+  <h2>Split PDF Files</h2>
+  <p style="margin-bottom:15px; font-size:16px; color:#555;font-family:Verdana, Geneva, Tahoma, sans-serif ">
+    Drag & drop a PDF or click to upload, then specify page ranges to split
+  </p>
+
+  <div class="drop-area" id="dropZone" style="
+      border:2px dashed #aaa;
+      padding:25px;
+      border-radius:6px;
+      cursor:pointer;
+      background:#fafafa;
+      transition:0.3s;
+      margin-bottom:15px;
+  ">
+    <p>📂 Drop PDF here or click to upload</p>
+    <input type="file" id="pdfFile" accept="application/pdf" style="display:none;">
+  </div>
+
+  <div id="fileName" style="margin-bottom:15px; font-weight:bold; color:#333;"></div>
+
+  <input type="text" id="pageRange" placeholder="Enter page ranges e.g. 1-2,4-5" style="
+      width:100%;
+      padding:12px;
+      border:1px solid #ccc;
+      border-radius:6px;
+      margin-bottom:15px;
+      font-size:14px;
+  ">
+
+  <button onclick="splitPDF()" style="
+      width:100%;
+      padding:12px;
+      background:#007bff;
+      color:#fff;
+      border:none;
+      border-radius:6px;
+      font-size:16px;
+      cursor:pointer;
+      transition:0.3s;
+  ">Split PDF</button>
+
+  <div id="status" style="margin-top:10px; font-size:14px;"></div>
+
+  <div id="downloadLinks" style="margin-top:15px;"></div>
+</div>
+
+<style>
+  .drop-area:hover {
+    background:#f1f7ff;
+    border-color:#007bff;
+  }
+  a.split-link {
+    display:inline-block;
+    margin:5px 0;
+    background:#28a745;
+    color:#fff;
+    padding:8px 12px;
+    border-radius:6px;
+    text-decoration:none;
+  }
+</style>
+
+<script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+<script>
+const dropZone = document.getElementById("dropZone");
+const fileInput = document.getElementById("pdfFile");
+const fileNameDiv = document.getElementById("fileName");
+let selectedFile = null;
+
+dropZone.addEventListener("click", ()=>fileInput.click());
+
+fileInput.addEventListener("change", (e)=>{
+  selectedFile = e.target.files[0];
+  if(selectedFile) fileNameDiv.innerText = selectedFile.name;
+});
+
+dropZone.addEventListener("dragover", e=>{ e.preventDefault(); dropZone.style.borderColor="#007bff"; });
+dropZone.addEventListener("dragleave", ()=>{ dropZone.style.borderColor="#aaa"; });
+dropZone.addEventListener("drop", e=>{
+  e.preventDefault();
+  dropZone.style.borderColor="#aaa";
+  selectedFile = e.dataTransfer.files[0];
+  if(selectedFile) fileNameDiv.innerText = selectedFile.name;
+});
+
+async function splitPDF(){
+  const { PDFDocument } = PDFLib;
+  const status = document.getElementById("status");
+  const downloadDiv = document.getElementById("downloadLinks");
+  downloadDiv.innerHTML = "";
+
+  if(!selectedFile){
+    alert("Please select a PDF file.");
+    return;
+  }
+
+  const rangesInput = document.getElementById("pageRange").value.trim();
+  if(!rangesInput){
+    alert("Please enter page ranges.");
+    return;
+  }
+
+  status.innerText = "Splitting PDF...";
+
+  const buffer = await selectedFile.arrayBuffer();
+  const pdf = await PDFDocument.load(buffer);
+
+  const ranges = rangesInput.split(',').map(r=>r.trim());
+
+  let partIndex = 1;
+  for(let r of ranges){
+    const match = r.match(/^(\d+)-(\d+)$/);
+    if(!match){
+      alert("Invalid range: "+r);
+      status.innerText="";
+      return;
+    }
+
+    let start = parseInt(match[1])-1;
+    let end = parseInt(match[2])-1;
+
+    if(start<0 || end>=pdf.getPageCount() || start>end){
+      alert("Invalid page range: "+r);
+      status.innerText="";
+      return;
+    }
+
+    const newPdf = await PDFDocument.create();
+    const pages = await newPdf.copyPages(pdf, Array.from({length:end-start+1}, (_,i)=>i+start));
+    pages.forEach(p=>newPdf.addPage(p));
+
+    const bytes = await newPdf.save();
+    const blob = new Blob([bytes], {type:"application/pdf"});
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${selectedFile.name.replace(".pdf","")}-part${partIndex}.pdf`;
+    a.innerText = `Download Part ${partIndex}`;
+    a.className = "split-link";
+
+    downloadDiv.appendChild(a);
+    partIndex++;
+  }
+
+  status.innerText = "✅ PDF split completed!";
+}
+</script>

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+    <meta charset="UTF-8">
+    <title>Merge PDF Files</title>
+    <head>
+    <link rel="stylesheet" href="/css/style.css">
+        <style>
+                .file-list {
+                    margin-bottom:15px;
+                }
+
+                .file-item {
+                    background:#f4f4f4;
+                    padding:10px;
+                    margin-bottom:8px;
+                    border-radius:6px;
+                    cursor:move;
+                    font-size:14px;
+                }
+
+                .file-item.dragging {
+                    opacity:0.5;
+                    background:#dfefff;
+                }
+
+                .file-id {
+                    background:#6c757d;
+                    color:#fff;
+                    font-size:12px;
+                    padding:4px 8px;
+                    border-radius:4px;
+                }
+                .container.p{
+                    font-family: Arial, Helvetica, sans-serif;
+                    font-size: larger;
+                }
+                span{
+                    font-family: 'Courier New', Courier, monospace;
+                    font-size: larger;
+                }
+        </style>
+    </head>
+<body>
+<div class="container">
+  <h2>Merge PDF Files</h2>
+  <p style="margin-bottom:15px; font-size:14px; color:#555;font-family:Verdana, Geneva, Tahoma, sans-serif">
+    Drag & drop PDFs, then reorder before merging
+  </p>
+
+  <div class="drop-area" id="dropZone">
+    <p>📂 Drop PDF files here or click to upload, after it can re-order here.</p>
+    <input type="file" id="pdfFiles" multiple accept="application/pdf">
+  </div>
+
+  <div id="fileList" class="file-list"></div>
+
+  <button onclick="mergePDFs()">Merge PDFs</button>
+
+  <div id="status" style="margin-top:10px; font-size:14px;"></div>
+
+  <a id="downloadLink" style="display:none; margin-top:15px;">
+    Download Merged PDF
+  </a>
+</div>
+
+<script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+
+<script>
+const dropZone = document.getElementById("dropZone");
+const fileInput = document.getElementById("pdfFiles");
+const fileList = document.getElementById("fileList");
+
+let selectedFiles = [];
+let dragIndex = null;
+
+// Click upload
+dropZone.addEventListener("click", () => fileInput.click());
+
+// File select
+fileInput.addEventListener("change", (e) => {
+  selectedFiles = Array.from(e.target.files).map((file, index) => ({
+    file: file,
+    id: index + 1   // fixed ID (won't change)
+  }));
+  renderList();
+});
+
+// Drag drop upload
+dropZone.addEventListener("dragover", (e) => {
+  e.preventDefault();
+  dropZone.style.borderColor = "#007bff";
+});
+
+dropZone.addEventListener("dragleave", () => {
+  dropZone.style.borderColor = "#aaa";
+});
+
+dropZone.addEventListener("drop", (e) => {
+  e.preventDefault();
+  dropZone.style.borderColor = "#aaa";
+
+  selectedFiles = Array.from(e.dataTransfer.files).map((file, index) => ({
+    file: file,
+    id: index + 1
+  }));
+
+  renderList();
+});
+
+// Render draggable list
+function renderList() {
+  fileList.innerHTML = "";
+
+  selectedFiles.forEach((item, index) => {
+    const div = document.createElement("div");
+    div.className = "file-item";
+    div.draggable = true;
+
+    div.innerHTML = `
+      <span class="file-id">#${item.id}</span>
+      <span class="file-name">${item.file.name}</span>
+    `;
+
+    // Drag start
+    div.addEventListener("dragstart", () => {
+      dragIndex = index;
+      div.classList.add("dragging");
+    });
+
+    // Drag over
+    div.addEventListener("dragover", (e) => e.preventDefault());
+
+    // Drop reorder
+    div.addEventListener("drop", () => {
+      const temp = selectedFiles[dragIndex];
+      selectedFiles.splice(dragIndex, 1);
+      selectedFiles.splice(index, 0, temp);
+      renderList();
+    });
+
+    // Drag end
+    div.addEventListener("dragend", () => {
+      div.classList.remove("dragging");
+    });
+
+    fileList.appendChild(div);
+  });
+}
+
+// Merge PDFs
+async function mergePDFs() {
+  const { PDFDocument } = PDFLib;
+  const status = document.getElementById("status");
+  const link = document.getElementById("downloadLink");
+
+  if (selectedFiles.length < 2) {
+    alert("Select at least 2 PDF files.");
+    return;
+  }
+
+  status.innerText = "Merging PDFs...";
+  link.style.display = "none";
+
+  const mergedPdf = await PDFDocument.create();
+
+    for (let item of selectedFiles) {
+    const buffer = await item.file.arrayBuffer();
+    const pdf = await PDFDocument.load(buffer);
+    const pages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+    pages.forEach(p => mergedPdf.addPage(p));
+    }
+
+  const bytes = await mergedPdf.save();
+  const blob = new Blob([bytes], { type: "application/pdf" });
+  const url = URL.createObjectURL(blob);
+
+  link.href = url;
+  link.download = "merged.pdf";
+  link.style.display = "block";
+  link.innerText = "Download Merged PDF";
+
+  status.innerText = "✅ PDF ready!";
+}
+</script>
+</body>
+</html>
